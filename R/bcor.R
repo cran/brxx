@@ -145,4 +145,5 @@ bcor=function(data,iter,burn,seed,CI,S0,nu0,mu0){
   print(noquote("Correlation Matrix"))
   print(noquote("*Credible interval excludes 0"))
   Out$table
+  return(Out)
 }

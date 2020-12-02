@@ -4,7 +4,7 @@
 \alias{brxx_general}
 \title{brxx_general: Bayesian Estimation of Reliability from Variance Estimates}
 \usage{
-brxx_general(a, b, alpha, beta, CI)
+brxx_general(a, b, alpha, beta, CI, items)
 }
 \arguments{
 \item{a}{True score variance estimate.}
@@ -16,6 +16,8 @@ brxx_general(a, b, alpha, beta, CI)
 \item{beta}{Prior error variance.}
 
 \item{CI}{Credible interval quantile, as a decimal (ie, for 95 percent, 0.95).}
+
+\item{items}{Number of test items.}
 }
 \value{
 Returns estimated median and quantile based credible limits for reliability.
@@ -28,6 +30,6 @@ a=18.7
 b=3.3
 alpha=3.51
 beta=1.75
-brxx_general(a=a,b=b,alpha=alpha,beta=beta,CI=0.95)
+brxx_general(a=a,b=b,alpha=alpha,beta=beta,CI=0.95,items=10)
 
 }

@@ -23,12 +23,13 @@
 #'@export
 
 
-standardize=function(data){out=matrix(nrow=nrow(data),ncol=ncol(data))
+standardize=function(data){Out=matrix(nrow=nrow(data),ncol=ncol(data))
 for(p in 1:ncol(data)){
   for(i in 1:nrow(data)){
-    out[i,p]=(data[i,p]-mean(data[,p],na.rm=T))/(sd(data[,p],na.rm=T))
+    Out[i,p]=(data[i,p]-mean(data[,p],na.rm=T))/(sd(data[,p],na.rm=T))
   }
 }
-out
+Out
+return(Out)
 }
 

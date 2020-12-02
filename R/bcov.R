@@ -107,7 +107,9 @@ Out$SIGMA=SIGMA
 print(noquote(""))
 print(noquote(""))
 print(noquote("Coviariance Matrix"))
+print(noquote("*Credible interval excludes 0"))
 Out$table
+return(Out)
 }
 
 

@@ -40,4 +40,5 @@ bomega_general=function(lambda,psi,alpha,beta,CI){
   out=round(qbeta(c(ll,0.5,ul),alpha+Lambda2,beta+Psi),4)
   names(out)=c("LL","Median","UL")
   out
+  return(out)
 }

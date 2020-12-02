@@ -6,6 +6,7 @@
 #'@param alpha Prior true score variance (subject variance)
 #'@param beta Prior error variance (residual variance)
 #'@param CI Credible interval quantile, as a decimal (ie, for 95 percent, 0.95).
+#'@param items Number of test items.
 #'
 #'@return Returns estimated median and quantile based credible limits for ICC.
 #'
@@ -16,18 +17,19 @@
 #'time=c(rep(0,20),rep(1,20))
 #'id=c(rep(1:20,2))
 #'mod=blmer(your_data_long~time+(1|id))
-#'brxx_ICC(mod=mod,alpha=3.51,beta=1.75,CI=0.95)}
+#'brxx_ICC(mod=mod,alpha=3.51,beta=1.75,CI=0.95,items=10)}
 #'
 #'@export
 
 
 
-brxx_ICC=function(mod,alpha,beta,CI){
+brxx_ICC=function(mod,alpha,beta,CI,items){
   s=summary(mod)
   ws=as.numeric(s$varcor[1])
   er=s$sigma
   CI=ifelse(missing(CI),0.95,CI)
   CI=ifelse(CI>1,CI/100,CI)
+  items=ifelse(missing(items),1,items)
   am=ifelse(missing(alpha),1,0)
   bm=ifelse(missing(beta),10,0)
   if(am+bm==0){alpha=alpha
@@ -40,7 +42,8 @@ brxx_ICC=function(mod,alpha,beta,CI){
   beta=1.75}
   ll=(1-CI)/2
   ul=1-ll
-  out=round(qbeta(c(ll,0.5,ul),alpha+ws,beta+er),4)
-  names(out)=c("LL","Median","UL")
-  out
+  Out=round(qbeta(c(ll,0.5,ul),alpha+ws*items,beta+er*items),4)
+  names(Out)=c("LL","Median","UL")
+  Out
+  return(Out)
 }

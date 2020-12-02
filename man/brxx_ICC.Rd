@@ -4,7 +4,7 @@
 \alias{brxx_ICC}
 \title{brxx_ICC: Bayesian Estimation of Reliability from ICC}
 \usage{
-brxx_ICC(mod, alpha, beta, CI)
+brxx_ICC(mod, alpha, beta, CI, items)
 }
 \arguments{
 \item{mod}{A mixed effects model object estimated by blmer.}
@@ -14,6 +14,8 @@ brxx_ICC(mod, alpha, beta, CI)
 \item{beta}{Prior error variance (residual variance)}
 
 \item{CI}{Credible interval quantile, as a decimal (ie, for 95 percent, 0.95).}
+
+\item{items}{Number of test items.}
 }
 \value{
 Returns estimated median and quantile based credible limits for ICC.
@@ -28,6 +30,6 @@ your_data_long=c(as.vector(your_data_wide[,1]),as.vector(your_data_wide[,2]))
 time=c(rep(0,20),rep(1,20))
 id=c(rep(1:20,2))
 mod=blmer(your_data_long~time+(1|id))
-brxx_ICC(mod=mod,alpha=3.51,beta=1.75,CI=0.95)}
+brxx_ICC(mod=mod,alpha=3.51,beta=1.75,CI=0.95,items=10)}
 
 }

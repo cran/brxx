@@ -23,25 +23,25 @@
 #'colnames(your_data)=c("x1","x2","x3","x4","x5")
 #'mod='tau=~x1+x2+x3+x4+x5'
 #'fit=bsem(mod,data=your_data)
-#'bomega(K=5,mod=mod,alpha=3.51,beta=1.75,CI=0.95)}
+#'bomega(K=5,mod=fit,alpha=3.51,beta=1.75,CI=0.95)}
 #'
 #'@export
 bomega=function(K,mod,alpha,beta,CI){
 
-  suppressMessages({s=as.vector(na.omit(as.numeric(summary(mod))))})
+  s=unlist(summary(mod))
   out=NULL
   hold=NULL
   for (k in 1:K){
 
-    hold=s[k]
+    hold=s[(length(s)-(3*K-k+2))]
     out=c(out,hold)
   }
   Lambda2=sum(as.numeric(out))^2
   out=NULL
   hold=NULL
   for (k in 1:K){
-as.numeric(s)
-    hold=s[(k+K)]
+
+    hold=s[(length(s)-(3*K-k+2)+K)]
     out=c(out,hold)
   }
   Psi=sum(as.numeric(out))
@@ -62,4 +62,5 @@ as.numeric(s)
   out=round(qbeta(c(ll,0.5,ul),alpha+Lambda2,beta+Psi),4)
   names(out)=c("LL","Median","UL")
   out
+  return(out)
 }

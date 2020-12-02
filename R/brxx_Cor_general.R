@@ -33,8 +33,9 @@ brxx_Cor_general=function(cor,alpha,beta,CI,items){
   beta=1.75}
   ll=(1-CI)/2
   ul=1-ll
-  out=round(qbeta(c(ll,0.5,ul),alpha+cor*items,beta+items*(1-cor)),4)
-  names(out)=c("LL","Median","UL")
-  out
+  Out=round(qbeta(c(ll,0.5,ul),alpha+cor*items,beta+items*(1-cor)),4)
+  names(Out)=c("LL","Median","UL")
+  Out
+  return(Out)
 
 }

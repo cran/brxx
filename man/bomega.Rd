@@ -36,6 +36,6 @@ Sigma=matrix(c(4,2,2,2,2,
 colnames(your_data)=c("x1","x2","x3","x4","x5")
 mod='tau=~x1+x2+x3+x4+x5'
 fit=bsem(mod,data=your_data)
-bomega(K=5,mod=mod,alpha=3.51,beta=1.75,CI=0.95)}
+bomega(K=5,mod=fit,alpha=3.51,beta=1.75,CI=0.95)}
 
 }

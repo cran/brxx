@@ -78,6 +78,8 @@ brxx_Cor=function(x,y,alpha,beta,iter,burn,seed,CI,S0,nu0,mu0,items){
    if(pct[s+1]!=pct[s]){print(noquote(paste(pct[s+1],"%")))}
 
  }
+ CI=ifelse(missing(CI),0.95,CI)
+ CI=ifelse(CI>1,CI/100,CI)
  am=ifelse(missing(alpha),1,0)
  bm=ifelse(missing(beta),10,0)
  if(am+bm==0){alpha=alpha
@@ -93,7 +95,8 @@ brxx_Cor=function(x,y,alpha,beta,iter,burn,seed,CI,S0,nu0,mu0,items){
  rxx=NULL
  items=ifelse(missing(items),1,items)
  for (s in burn:nrow(SIGMA)){
-   rxx[s-burn]=rbeta(1,alpha+(SIGMA[s,2])*items,beta+(sqrt(SIGMA[s,1]*SIGMA[s,4]))*items)
+   rxx[s-burn]=(alpha+(SIGMA[s,2])*items)/
+      (alpha+(SIGMA[s,2])*items+beta+(sqrt(SIGMA[s,1]*SIGMA[s,4]))*items)
    num=(s-burn+1)
    denom=(nrow(SIGMA)-burn)
    pct[s-burn+2]=round((num/denom)*10)*10
@@ -111,8 +114,8 @@ brxx_Cor=function(x,y,alpha,beta,iter,burn,seed,CI,S0,nu0,mu0,items){
  print(noquote(""))
  print(noquote(""))
  print(noquote("Reliability estimate"))
- print(noquote("*Credible interval excludes 0"))
  Out$rxx
+ return(Out)
 
 }
 
