@@ -16,6 +16,8 @@
 #'@param items Number of test items.
 #'
 #'@import MCMCpack
+#'@import MASS
+#'@import TeachingDemos
 #'
 #'@return Returns median posterior estimates of the variance covariance matrix.
 #'
@@ -74,7 +76,7 @@ brxx_Cor=function(x,y,alpha,beta,iter,burn,seed,CI,S0,nu0,mu0,items){
    ###Save results
    THETA=rbind(THETA,theta)
    SIGMA=rbind(SIGMA,c(Sigma))
-   pct[s+1]=(round(s/iter*10))*10
+   pct[s+1]=(round(s/iter*10,1))*10
    if(pct[s+1]!=pct[s]){print(noquote(paste(pct[s+1],"%")))}
 
  }
@@ -96,26 +98,22 @@ brxx_Cor=function(x,y,alpha,beta,iter,burn,seed,CI,S0,nu0,mu0,items){
  items=ifelse(missing(items),1,items)
  for (s in burn:nrow(SIGMA)){
    rxx[s-burn]=(alpha+(SIGMA[s,2])*items)/
-      (alpha+(SIGMA[s,2])*items+beta+(sqrt(SIGMA[s,1]*SIGMA[s,4]))*items)
+      (alpha+beta+(sqrt(SIGMA[s,1]*SIGMA[s,4]))*items)
    num=(s-burn+1)
    denom=(nrow(SIGMA)-burn)
-   pct[s-burn+2]=round((num/denom)*10)*10
+   pct[s-burn+2]=round((num/denom)*10,1)*10
    if(pct[s-burn+2]!=pct[s-burn+1]){print(noquote(paste(pct[s-burn+2],"%")))}
 
  }
- ll=(1-CI)/2
- ul=1-ll
- rxx1=quantile(probs=c(ll,0.5,ul),rxx)
+ rxx1=round(c(quantile(probs=c(0.5),rxx),
+              emp.hpd(rxx,conf=CI)[1],
+              emp.hpd(rxx,conf=CI)[2]),4)
  Out=list()
- Out$rxx=rxx1
  Out$THETA=THETA
  Out$SIGMA=SIGMA
  Out$rxx_s=rxx
- print(noquote(""))
- print(noquote(""))
- print(noquote("Reliability estimate"))
- Out$rxx
+ Out$rxx=rxx1
+ names(Out$rxx)=c("Median","LL","UL")
  return(Out)
 
 }
-

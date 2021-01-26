@@ -8,6 +8,8 @@
 #'@param beta Prior error variance.
 #'@param CI Credible interval quantile, as a decimal (ie, for 95 percent, 0.95).
 #'
+#'@import TeachingDemos
+#'
 #'@return Returns estimated median and quantile based credible limits for omega.
 #'
 #'@examples
@@ -35,10 +37,10 @@ bomega_general=function(lambda,psi,alpha,beta,CI){
   beta=0.4*alpha/0.6}
   if(am+bm==11){alpha=3.51
   beta=1.75}
-  ll=(1-CI)/2
-  ul=1-ll
-  out=round(qbeta(c(ll,0.5,ul),alpha+Lambda2,beta+Psi),4)
-  names(out)=c("LL","Median","UL")
-  out
-  return(out)
+  Out=round(c(qbeta(c(0.5),alpha+Lambda2,beta+Psi),
+              hpd(qbeta,shape1=alpha+Lambda2,shape2=beta+Psi,conf=CI)[1],
+              hpd(qbeta,shape1=alpha+Lambda2,shape2=beta+Psi,conf=CI)[2]),4)
+  names(Out)=c("Median","LL","UL")
+  Out
+  return(Out)
 }

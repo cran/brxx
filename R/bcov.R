@@ -11,18 +11,21 @@
 #'@param S0 Prior variance covariance matrix.
 #'@param nu0 Prior degrees of freedom for inverse Wishart prior distribution.
 #'
-#'#'@import MCMCpack
+#'@import MCMCpack
+#'@import MASS
+#'@import TeachingDemos
 #'
 #'@return Returns median posterior estimates of the variance covariance matrix.
 #'
 #'@examples
+#'\dontrun{
 #'set.seed(999)
 #'your_data=mvrnorm(n=15,mu=c(0,0),Sigma=matrix(c(4,3,3,9),nrow=2,ncol=2))
 #'Mu0=c(0,0)
 #'Sigma0=matrix(c(1,0.6,0.6,4),nrow=2,ncol=2)
 #'Nu0=3-1
-#'bcor(data=your_data,iter=5000,burn=2500,seed=999,CI=0.95,
-#'     mu0=Mu0,S0=Sigma0,nu0=Nu0)
+#'bcov(data=your_data,iter=5000,burn=2500,seed=999,CI=0.95,
+#'     mu0=Mu0,S0=Sigma0,nu0=Nu0)}
 #'
 #'@export
 
@@ -69,11 +72,12 @@ for(s in 1:iter)
   ###Save results
   THETA=rbind(THETA,theta)
   SIGMA=rbind(SIGMA,c(Sigma))
-  pct[s+1]=(round(s/iter*10))*10
+  pct[s+1]=(round(s/iter*10,1))*10
   if(pct[s+1]!=pct[s]){print(noquote(paste(pct[s+1],"%")))}
 
 }
 VAR_M=NULL
+VAR_SD=NULL
 VAR_LL=NULL
 VAR_UL=NULL
 CI=ifelse(missing(CI),0.95,CI)
@@ -82,8 +86,9 @@ ll=(1-CI)/2
 ul=1-ll
 for (a in 1:ncol(SIGMA)){
 VAR_M[a]=quantile(probs=c(0.5),SIGMA[burn:nrow(SIGMA),a])
-VAR_LL[a]=quantile(probs=c(ll),SIGMA[burn:nrow(SIGMA),a])
-VAR_UL[a]=quantile(probs=c(ul),SIGMA[burn:nrow(SIGMA),a])
+VAR_SD[a]=sd(SIGMA[burn:nrow(SIGMA),a])
+VAR_LL[a]=emp.hpd(SIGMA[burn:nrow(SIGMA),a],conf=CI)[1]
+VAR_UL[a]=emp.hpd(SIGMA[burn:nrow(SIGMA),a],conf=CI)[2]
 
 }
 
@@ -97,19 +102,13 @@ table=data.frame(COV)
 colnames(table)=c(colnames(data))
 rownames(table)=c(colnames(data))
 Out=list()
-Out$table=table
+Out$MU=THETA
+Out$SIGMA=SIGMA
 Out$VAR_M=matrix(VAR_M,nrow=ncol(data),ncol=ncol(data))
+Out$VAR_SD=matrix(VAR_SD,nrow=ncol(data),ncol=ncol(data))
 Out$VAR_LL=matrix(VAR_LL,nrow=ncol(data),ncol=ncol(data))
 Out$VAR_UL=matrix(VAR_UL,nrow=ncol(data),ncol=ncol(data))
-Out$THETA=THETA
-Out$SIGMA=SIGMA
+Out$table=table
 
-print(noquote(""))
-print(noquote(""))
-print(noquote("Coviariance Matrix"))
-print(noquote("*Credible interval excludes 0"))
-Out$table
 return(Out)
 }
-
-

@@ -1,7 +1,7 @@
 Package: brxx
 Type: Package
 Title: Bayesian Test Reliability Estimation
-Version: 0.1.1
+Version: 0.1.2
 Author: Joshua Ray Tanzer
 Maintainer: Joshua Ray Tanzer <jtanzer@lifespan.org>
 Description: When samples contain missing data, are small, or are suspected of bias,
@@ -12,13 +12,13 @@ Description: When samples contain missing data, are small, or are suspected of b
     interface for estimating test reliability.  Here, reliability is modeled as a beta
     distributed random variable with shape parameters alpha=true score variance and
     beta=error variance (Tanzer & Harlow, 2020) <doi:10.1080/00273171.2020.1854082>.
-Depends: MCMCpack, blavaan, blme
-Imports: MASS
+Depends: MCMCpack, GPArotation, TeachingDemos, blavaan, blme
+Imports: MASS, rstan
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 NeedsCompilation: no
-Packaged: 2020-12-02 18:25:17 UTC; CHS-User
+Packaged: 2021-01-26 16:18:07 UTC; CHS-User
 Repository: CRAN
-Date/Publication: 2020-12-02 22:50:15 UTC
+Date/Publication: 2021-01-26 17:00:06 UTC

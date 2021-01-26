@@ -8,6 +8,10 @@
 #'@param CI Credible interval quantile, as a decimal (ie, for 95 percent, 0.95).
 #'@param items Number of test items.
 #'
+#'@import MCMCpack
+#'@import MASS
+#'@import TeachingDemos
+#'
 #'@return Returns estimated median and quantile based credible limits for ICC.
 #'
 #'@examples
@@ -42,8 +46,9 @@ brxx_ICC=function(mod,alpha,beta,CI,items){
   beta=1.75}
   ll=(1-CI)/2
   ul=1-ll
-  Out=round(qbeta(c(ll,0.5,ul),alpha+ws*items,beta+er*items),4)
-  names(Out)=c("LL","Median","UL")
-  Out
+  Out=round(c(qbeta(c(0.5),alpha+ws*items,beta+er*items),
+            hpd(qbeta,shape1=alpha+ws*items,shape2=beta+er*items,conf=CI)[1],
+            hpd(qbeta,shape1=alpha+ws*items,shape2=beta+er*items,conf=CI)[2]),4)
+  names(Out)=c("Median","LL","UL")
   return(Out)
 }

@@ -27,6 +27,12 @@ your_data=data.frame(mvrnorm(n=20,mu=c(0,0,0,0,0,0,0),
                                            2,2,2,2,2,4,2,
                                            2,2,2,2,2,2,4),
                                          nrow=7, ncol=7)))
-standardize(your_data)
+your_data_miss=matrix(ncol=5,nrow=20)
+for (i in 1:20){
+for (p in 1:5){
+   your_data_miss[i,p]=ifelse(runif(1,0,1)<0.2,NA,your_data[i,p])
+ }
+}
+standardize(your_data_miss)
 
 }

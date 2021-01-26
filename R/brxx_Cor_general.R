@@ -8,6 +8,10 @@
 #'@param CI Credible interval quantile, as a decimal (ie, for 95 percent, 0.95).
 #'@param items Number of test items.
 #'
+#'@import MCMCpack
+#'@import MASS
+#'@import TeachingDemos
+#'
 #'@return Returns estimated median and quantile based credible limits for reliability.
 #'
 #'@examples
@@ -31,10 +35,12 @@ brxx_Cor_general=function(cor,alpha,beta,CI,items){
   beta=0.4*alpha/0.6}
   if(am+bm==11){alpha=3.51
   beta=1.75}
-  ll=(1-CI)/2
-  ul=1-ll
-  Out=round(qbeta(c(ll,0.5,ul),alpha+cor*items,beta+items*(1-cor)),4)
-  names(Out)=c("LL","Median","UL")
+  Out=round(c(qbeta(c(0.5),alpha+cor*items,beta+items*(1-cor)),
+              hpd(qbeta,shape1=alpha+cor*items,
+                  shape2=beta+items*(1-cor),conf=CI)[1],
+              hpd(qbeta,shape1=alpha+cor*items,
+                  shape2=beta+items*(1-cor),conf=CI)[2]),4)
+  names(Out)=c("Median","LL","UL")
   Out
   return(Out)
 

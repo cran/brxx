@@ -30,6 +30,7 @@ Returns median posterior estimates of the correlation matrix.
 This function estimates coefficient omega internal consistency reliability.
 }
 \examples{
+
 set.seed(999)
 your_data=mvrnorm(n=15,mu=c(0,0),Sigma=matrix(c(4,3,3,9),nrow=2,ncol=2))
 Mu0=c(0,0)
@@ -37,6 +38,4 @@ Sigma0=matrix(c(1,0.6,0.6,4),nrow=2,ncol=2)
 Nu0=1
 bcor(data=your_data,iter=5000,burn=2500,seed=999,CI=0.95,
     mu0=Mu0,S0=Sigma0,nu0=Nu0)
-
-
 }

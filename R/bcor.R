@@ -14,8 +14,11 @@
 #'@return Returns median posterior estimates of the correlation matrix.
 #'
 #'@import MCMCpack
+#'@import MASS
+#'@import TeachingDemos
 #'
 #'@examples
+#'
 #'set.seed(999)
 #'your_data=mvrnorm(n=15,mu=c(0,0),Sigma=matrix(c(4,3,3,9),nrow=2,ncol=2))
 #'Mu0=c(0,0)
@@ -23,8 +26,6 @@
 #'Nu0=1
 #'bcor(data=your_data,iter=5000,burn=2500,seed=999,CI=0.95,
 #'     mu0=Mu0,S0=Sigma0,nu0=Nu0)
-#'
-#'
 #'@export
 
 
@@ -73,26 +74,11 @@ bcor=function(data,iter,burn,seed,CI,S0,nu0,mu0){
     ###Save results
     THETA=rbind(THETA,theta)
     SIGMA=rbind(SIGMA,c(Sigma))
-    pct[s+1]=(round(s/iter*10))*10
+    pct[s+1]=(round(s/iter*10,1))*10
     if(pct[s+1]!=pct[s]){print(noquote(paste(pct[s+1],"%")))}
-
   }
-  VAR_M=NULL
-  VAR_LL=NULL
-  VAR_UL=NULL
   CI=ifelse(missing(CI),0.95,CI)
   CI=ifelse(CI>1,CI/100,CI)
-  ll=(1-CI)/2
-  ul=1-ll
-  for (a in 1:ncol(SIGMA)){
-    VAR_M[a]=quantile(probs=c(0.5),SIGMA[burn:nrow(SIGMA),a])
-    VAR_LL[a]=quantile(probs=c(ll),SIGMA[burn:nrow(SIGMA),a])
-    VAR_UL[a]=quantile(probs=c(ul),SIGMA[burn:nrow(SIGMA),a])
-
-  }
-
-
-
   COR=NULL
   mat=matrix(nrow=ncol(data),ncol=ncol(data))
   cor=matrix(nrow=ncol(data),ncol=ncol(data),0)
@@ -108,17 +94,19 @@ bcor=function(data,iter,burn,seed,CI,S0,nu0,mu0){
     }
     num=(s-burn+1)
     denom=(nrow(SIGMA)-burn)
-    pct[s-burn+2]=round((num/denom)*10)*10
+    pct[s-burn+2]=round((num/denom)*10,1)*10
     if(pct[s-burn+2]!=pct[s-burn+1]){print(noquote(paste(pct[s-burn+2],"%")))}
 
   }
   COR_M=NULL
+  COR_SD=NULL
   COR_LL=NULL
   COR_UL=NULL
   for (a in 1:ncol(COR)){
-    COR_M[a]=quantile(probs=c(0.5),COR[1:nrow(COR),a])
-    COR_LL[a]=quantile(probs=c(ll),COR[1:nrow(COR),a])
-    COR_UL[a]=quantile(probs=c(ul),COR[1:nrow(COR),a])
+    COR_M[a]=quantile(probs=c(0.5),COR[,a])
+    COR_SD=sd(COR[1:nrow(COR),a])
+    COR_LL[a]=emp.hpd(COR[,a],conf=CI)[1]
+    COR_UL[a]=emp.hpd(COR[,a],conf=CI)[2]
 
   }
 
@@ -132,18 +120,13 @@ bcor=function(data,iter,burn,seed,CI,S0,nu0,mu0){
   rownames(table)=c(colnames(data))
   diag(table)="1 "
   Out=list()
-  Out$table=table
-  Out$M=COR_M
-  Out$LL=COR_LL
-  Out$UL=COR_UL
-  Out$THETA=THETA
+  Out$MU=THETA
   Out$SIGMA=SIGMA
-  Out$COR=COR
+  Out$M=matrix(COR_M,nrow=ncol(data),ncol=ncol(data))
+  Out$SD=matrix(COR_SD,nrow=ncol(data),ncol=ncol(data))
+  Out$LL=matrix(COR_LL,nrow=ncol(data),ncol=ncol(data))
+  Out$UL=matrix(COR_UL,nrow=ncol(data),ncol=ncol(data))
+  Out$Table=table
 
-  print(noquote(""))
-  print(noquote(""))
-  print(noquote("Correlation Matrix"))
-  print(noquote("*Credible interval excludes 0"))
-  Out$table
   return(Out)
 }

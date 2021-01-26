@@ -18,8 +18,8 @@ Author: Joshua Ray Tanzer
 
 Functions
 ---------
-* __bcov__: Given an N by p data matrix, this function will estimate a variance covariance matrix based on a prior inverse Wishart distribution.  Priors can be specified, if none are specified default prior variances are sample variances and default prior covariances are zero.  A Gibbs sampling approach is implemented.  Convergence should be assessed before interpreting results. Alpha and beta prior reliability parameters also need to be specified.  See below for a discussion of prior selection.  Alpha can be interpreted as prior true score variance and beta as prior error variance for the test.   For additional details on Bayesian methods and Monte Carlo Markov Chain procedures, see Hoff, P. D. (2009). A first course in Bayesian statistical methods. New York: Springer.
-* __bcor__: Given an N by p data matrix, this function will estimate a correlation matrix based on a prior inverse Wishart distribution.  Priors can be specified, if none are specified default prior variances are sample variances and default prior covariances are zero.  A Gibbs sampling approach is implemented.  Convergence should be assessed before interpreting results.  Alpha and beta prior reliability parameters also need to be specified.  See below for a discussion of prior selection.  Alpha can be interpreted as prior true score variance and beta as prior error variance for the test.   For additional details on Bayesian methods and Monte Carlo Markov Chain procedures, see Hoff, P. D. (2009). A first course in Bayesian statistical methods. New York: Springer.
+* __bcov__: Given an N by P data matrix, this function will estimate a variance covariance matrix based on a prior inverse Wishart distribution.  Priors can be specified, if none are specified default prior variances are sample variances and default prior covariances are zero.  A Gibbs sampling approach is implemented.  Convergence should be assessed before interpreting results. Alpha and beta prior reliability parameters also need to be specified.  See below for a discussion of prior selection.  Alpha can be interpreted as prior true score variance and beta as prior error variance for the test.   For additional details on Bayesian methods and Monte Carlo Markov Chain procedures, see Hoff, P. D. (2009). A first course in Bayesian statistical methods. New York: Springer.
+* __bcor__: Given an N by P data matrix, this function will estimate a correlation matrix based on a prior inverse Wishart distribution.  Priors can be specified, if none are specified default prior variances are sample variances and default prior covariances are zero.  A Gibbs sampling approach is implemented.  Convergence should be assessed before interpreting results.  Alpha and beta prior reliability parameters also need to be specified.  See below for a discussion of prior selection.  Alpha can be interpreted as prior true score variance and beta as prior error variance for the test.   For additional details on Bayesian methods and Monte Carlo Markov Chain procedures, see Hoff, P. D. (2009). A first course in Bayesian statistical methods. New York: Springer.
 * __bomega__: This function is intended as an add on feature for measurement model estimation by blavaan.  If a blavaan model is specified with k items loading onto a single factor, bomega will extract the loadings and error variances to estimate coefficient omega from the model object.  Then, given prior true score variance (alpha) and prior error variance (beta), coefficient omega internal consistency reliability is estimated as a beta distributed random variable.  For more information on blavaan, see https://faculty.missouri.edu/~merklee/blavaan/.
 * __bomega_general__: This function estimates coefficient omega internal consistency reliability from user specified item loadings and error variances, in addition to prior estimates of true score variance (alpha) and prior error variance (beta).
 * __brxx_Cor__: When X any Y variables are specified with this function, reliability is estimated based on their correlation.  The bcov function is used (see above).  True score variance is estimated as the covariance between measures and error variance is estimated as SD_x*SD_2_y-Cov(x,y).  These values, plus alpha prior true score variance and beta prior error variance are used to estimate reliability as a beta distributed random variable.
@@ -28,6 +28,11 @@ Functions
 * __brxx_ICC__: This is an add on function for blme output.  If reliability is estimated from intraclass correlation coefficient, reliability is estimated given prior values for alpha (true score variance) and beta (error variance).  A blmer fitted model object from the blme package is provided, and the within subject effect and residual variance is extracted to estimate the ICC.  For more information on the blme package, see https://cran.r-project.org/web/packages/blme/blme.pdf.
 * __brxx_ICC_general__: A general form for estimating reliability from intraclass correlation coefficient, all that needs to be specified are the within subject variance, residual variance, and prior shape parameters for reliability (alpha as true score variance and beta as error variance).
 * __standardize__: This function standardizes all items in the dataset.  This is included in the package for ease of use.  It is strongly recommended to standardize items before combining scores into composites and estimating reliability, so as to avoid scaling effects on reliability estimates.  More discussion of this is provided below.
+* __scree__: Calculates eigenvalues, percentage of variance, and their accumulative values.  Also provides the scree plot.  Eigenvalues are calculated based on the pairwise complete cases of the correlation matrix, to account for the possibility of missing data.
+* __prep__: Creates a list object from a dataset for estimating a Bayesian exploratory factor analysis model.  All that needs to be specified is the data and the number of factors to be extracted.  Also able to be specified is the prior loading matrix for the means of the loadings (assumed to have variance IG(0.0001,0.0001)).  If no prior is given, the maximum likelihood solution will be assumed.  Stan code for the exploratory factor analysis model used in conjunction with this function is provided in the examples.
+* __unpack__: Takes raw Stan output from the model included in the examples and converts it into parceled matrices for each parameter of the factor analysis model (Lambda matrix of item loadings, x_i matrix of latent trait scores, tau vector of item means, and alpha vector of loading variance estimates).  All that needs to be provided is an S by theta matrix of raw Stan output (see example) and list object of model information as is created by the format function.
+* __process__: Provided with an unpacked loading matrix, this function calculates communality, uniqueness, and reliability estimates.  If the number of factors is greater than one, matrix rotation is performed and returns rotated loadings, interfactor correlations, loadings on the G factor, and estimates of hierarchical omega.  If the number of factors is one, total omega is calculated instead.  The S by P*Q loading matrix samples of the posterior needs to be provided, as well as the model information in list form from the format function.  Lastly, the matrix rotation can be specified based on the options in the GPArotation package; if roation is left blank, an oblimin rotation is assumed.  Outputs come as a list of S by Theta matrices for loadings, communalities, uniquenesses, and reliability estimates; if more than one factor is extracted, the list also includes G factor loadings and interfactor correlations.
+* __summarize__: This function converts an S by Theta matrix of raw Stan output into summary matrices.  The raw data matrix of posterior samples must be specified, as well as the number of rows and columns for the target matrix.  This can come from the unpack statment (e.g. to summarize the x_i matrix of N by Q dimensionality of latent traits) or the process statement (e.g. to summarize the Lambda matrix of P by Q dimensionality of rotated item loadings).  An additional input is the CI, which specifies the width of credible intervals as a percentage.  If no limit is specified, 95% is assumed.  The output includes the median, standard deviation, upper limit and lower limit.  Limits on the CIs are highest posterior density based.  Lastly, a simple summary table is created, with the median (SD) and a * to indicate which values at the specified alpha level CI exclude a value of 0.
 
 Prior selection
 ----------------
@@ -36,7 +41,7 @@ In this package, reliability is modeled as a beta distributed random variable.  
 
 Item Scaling
 ------------
-Because this method uses a beta distribution to infer the probable values of reliability, the larger the variance, true and error, the more precise the estimate.  It follows that two tests scaled at different ranges (e.g. 1 to 7 versus 1 to 100) would have vastly different reliability estimates as a function of their scaling minimum and maximum.  To address this, it is strongly recommended that each item be standardized before being summed to provide a composite score.  This will result in precision of estimate that is a function of test length rather than item scaling, which is already an expected and documented relationship.  The standardize function is provided to easily standardize tests.  Additionally, the brxx_Cor and brxx_Cor_general functions allows for the user to specify the number of items on the test.  This could be used for estimates of test retest reliability, where the data inputs x and y are test and retest composite scores.  Alternatively, if split half reliability is desired, then the number of items specified could represent the length of the split halves.
+Because this method uses a beta distribution to infer the probable values of reliability, the larger the variance, true and error, the more precise the estimate.  It follows that two tests scaled at different ranges (e.g. 1 to 7 versus 1 to 100) would have vastly different reliability estimates as a function of their scaling minimum and maximum.  To address this, it is strongly recommended that each item be standardized before being summed to provide a composite score.  This will result in precision of estimate that is a function of test length rather than item scaling, which is already an expected and documented relationship.  The standardize function is provided to easily standardize item scores.  Additionally, the the user can specify the number of items on the test in the event that scores are already summed into composites.  If this is the case (e.g. if test retest reliability is desired but the individual item responses are missing), the composite scores can be standardized and the number of items on the test can be specified.  This will properly rescale the precision of reliability estimates to the test length.
 
 Examples
 --------
@@ -331,6 +336,105 @@ fit=blmer(Y~(1|ID),data=your_data)
 Then, read in the fitted blme model to the brxx_ICC statement.
 ```{r}
 brxx_ICC(mod=fit,alpha=3.51,beta=1.75,CI=0.95)
+```
+
+## Bayesian factor analysis using Stan
+To estimate a Bayesian factor analysis model, stan software can be used based on the following model code:
+```{r}
+fa="
+data {
+int<lower=0> N; // Number of observations
+int<lower=0> P; // Number of items
+int<lower=0> Q; // Number of latent dimensions
+matrix[N, P] D_O; // Observed data matrix
+matrix[P, Q] Load_Prior; // Prior loading matrix
+matrix[P, P] I; //Identity matrix
+matrix[N,P] R; //Missing data matrix
+}
+
+parameters {
+matrix[N, Q] X; // Latent trait matrix
+matrix[P, Q] Lambda; // Loading matrix
+vector[P] tau; // Grand mean vector
+vector<lower=0>[Q] alpha; // Loading variance vector
+}
+
+model {
+matrix [N,P] X_Loading;
+matrix [N,P] D_I;
+for (i in 1:N) for (p in 1:P) 
+X_Loading[i,p]=X[i,]*Lambda[p,]';
+for (i in 1:N) for (p in 1:P) 
+D_I[i,p]=D_O[i,p]*(1-R[i,p])+X_Loading[i,p]'*(R[i,p])+tau[p];
+
+for (i in 1:N) for (q in 1:Q) X[i,q] ~ normal(0,1);
+for (i in 1:N) tau ~ normal(0,1);
+for(q in 1:Q) alpha[q] ~ inv_gamma(1e-4,1e-4);
+for(q in 1:Q) Lambda[,q] ~ multi_normal(Load_Prior[,q], sqrt(alpha[q])*I);
+for(i in 1:N) for (p in 1:P) D_I[i,p]~ normal(X_Loading[i,p]+tau[p], 1);
+}
+
+"
+
+model=stan_model(model_code = fa)
+```
+This step may take some time, as Stan needs to rewrite the model code in C++.  Note that this model accounts for missing data by imputing the missing values with the expected values for individuals at each subsequent iteration of posterior sampling.  Raw data files can be prepared this model by the standardize and format functions.
+```{R}
+your_data_miss_s=standardize(your_data_miss)
+formatted_data=prep(your_data_miss_s,nfactors=3)
+```
+Sampling the posterior distributions using this model can be saved in an S by Theta matrix using the following code.  This may also take some time, as the model reiterates parameter estimation.
+```{R}
+out=sampling(model, data=formatted_data, iter=5000, seed=999)
+res=as.matrix(out)
+```
+Model convergence diagnostics can be summarized with
+```{R}
+plot(effectiveSize(Loading_Matrix),main="Effective Sample Size",ylab="N")
+lines(rep(nrow(res),ncol(res)),col="red",lty=2)
+
+plot(geweke.diag(res)$z,main="Geweke Diagnostic",ylab="Z")
+lines(rep(1.96,ncol(res)),col="red",lty=2)
+lines(rep(-1.96,ncol(res)),col="red",lty=2)
+```
+and individual trace plots can be examined using:
+```{R}
+plot(res[,1])
+lines(res[,1])
+```
+All parameters should be visually examined for convergence.  The individual matrices of the factor analysis model can be separated out with the unpack function:
+```{R}
+unpacked=unpack(Samples=res,Format=formatted_data)
+```
+and the loadings can be rotated and further processed using the process function.
+```{R}
+processed=process(Loading_Matrix=unpacked$Loading_Matrix,
+                  Format=formatted_data,
+                  Rotate="oblimin")
+```
+Lastly, final summary tables of all relevant information can be created using
+```{R}
+summarize(processed$Loadings,
+          nrow=Formatted_data$P,
+          ncol=Formatted_data$Q)$Table
+summarize(processed$Communality,
+          nrow=Formatted_data$P,
+          ncol=1)$Table
+summarize(processed$Uniqueness,
+          nrow=Formatted_data$P,
+          ncol=1)$Table
+summarize(processed$G_Factor,
+          nrow=Formatted_data$P,
+          ncol=1)$Table
+summarize(processed$Interfactor_Correlations,
+          nrow=Formatted_data$Q,
+          ncol=Formatted_data$Q)$Table
+summarize(processed$Omega,
+          nrow=1,
+          ncol=1)$Table
+summarize(unpacked$Tau_Matrix,
+          nrow=Formatted_data$P,
+          ncol=1)$Table
 ```
 
 Acknowledgements

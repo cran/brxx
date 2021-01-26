@@ -19,9 +19,7 @@ bcov(data, iter, burn, seed, CI, S0, nu0, mu0)
 
 \item{S0}{Prior variance covariance matrix.}
 
-\item{nu0}{Prior degrees of freedom for inverse Wishart prior distribution.
-
-#'@import MCMCpack}
+\item{nu0}{Prior degrees of freedom for inverse Wishart prior distribution.}
 
 \item{mu0}{Prior means for each column.}
 }
@@ -32,12 +30,13 @@ Returns median posterior estimates of the variance covariance matrix.
 This function estimates the variance covariance matrix for a
 }
 \examples{
+\dontrun{
 set.seed(999)
 your_data=mvrnorm(n=15,mu=c(0,0),Sigma=matrix(c(4,3,3,9),nrow=2,ncol=2))
 Mu0=c(0,0)
 Sigma0=matrix(c(1,0.6,0.6,4),nrow=2,ncol=2)
 Nu0=3-1
-bcor(data=your_data,iter=5000,burn=2500,seed=999,CI=0.95,
-    mu0=Mu0,S0=Sigma0,nu0=Nu0)
+bcov(data=your_data,iter=5000,burn=2500,seed=999,CI=0.95,
+    mu0=Mu0,S0=Sigma0,nu0=Nu0)}
 
 }
